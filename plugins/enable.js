@@ -26,7 +26,9 @@ const features = [
     { key: 'antivirus', label: 'Antivirus' },
     { key: 'antibot', label: 'Antibot' },
     { key: 'antivoip', label: 'Antivoip' },
-    { key: 'chatbotPrivato', label: 'ChatbotPrivato' }
+    { key: 'chatbotPrivato', label: 'ChatbotPrivato' },
+    { key: 'antimedia', label: 'Antimedia' },
+    { key: 'antipaki', label: 'Antipaki' }
 ];
 
 let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isROwner }) => {

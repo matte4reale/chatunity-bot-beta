@@ -95,6 +95,8 @@ export async function handler(chatUpdate) {
                 if (!('antispamcomandi' in chat)) chat.antispamcomandi = true; // Attivo di default
                 if (!('antibestemmie' in chat)) chat.antibestemmie = false; // Attivo/disattivo anti bestemmie
                 if (!('antibot' in chat)) chat.antibot = false; // Disattivato di default
+                if (!('antimedia' in chat)) chat.antimedia = false; // <-- aggiungi questa riga
+                if (!('antipaki' in chat)) chat.antipaki = false; // <-- aggiungi questa riga
             } else
                 global.db.data.chats[m.chat] = {
                     name: this.getName(m.chat),
@@ -139,6 +141,8 @@ export async function handler(chatUpdate) {
                     antispamcomandi: true, // Attivo di default
                     antibestemmie: false, // Attivo/disattivo anti bestemmie
                     antibot: false, // Disattivato di default
+                    antimedia: false, // <-- aggiungi questa riga
+                    antipaki: false, // <-- aggiungi questa riga
                 }
             let settings = global.db.data.settings[this.user.jid]
             if (typeof settings !== 'object') global.db.data.settings[this.user.jid] = {}
