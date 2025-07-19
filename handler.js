@@ -137,12 +137,12 @@ export async function handler(chatUpdate) {
                     money: 0, 
                     warn: 0,
                     name: m.name,
-                    antivirus: false, // Aggiunto antivirus
-                    antispamcomandi: true, // Attivo di default
-                    antibestemmie: false, // Attivo/disattivo anti bestemmie
-                    antibot: false, // Disattivato di default
-                    antimedia: false, // <-- aggiungi questa riga
-                    antipaki: false, // <-- aggiungi questa riga
+                    antivirus: false, 
+                    antispamcomandi: true, 
+                    antibestemmie: false, 
+                    antibot: false, 
+                    antimedia: false, 
+                    antipaki: false, 
                 }
             let settings = global.db.data.settings[this.user.jid]
             if (typeof settings !== 'object') global.db.data.settings[this.user.jid] = {}
