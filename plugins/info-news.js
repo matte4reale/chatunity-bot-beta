@@ -1,11 +1,29 @@
-const sources = [
-  { name: 'Gazzetta', url: 'https://www.gazzetta.it/rss/Calcio.xml' },
-  { name: 'Tuttosport', url: 'https://www.tuttosport.com/rss/calcio.xml' },
-  { name: 'Corriere dello Sport', url: 'https://www.corrieredellosport.it/rss/calcio' }
-];
+const allSources = {
+  calcio: [
+    { name: 'Gazzetta', url: 'https://www.gazzetta.it/rss/Calcio.xml' },
+    { name: 'Tuttosport', url: 'https://www.tuttosport.com/rss/calcio.xml' },
+    { name: 'Corriere dello Sport', url: 'https://www.corrieredellosport.it/rss/calcio' }
+  ],
+  basket: [
+    { name: 'Sky Sport - Basket', url: 'https://sport.sky.it/rss/basket.xml' }
+  ],
+  tennis: [
+    { name: 'Ubitennis', url: 'https://www.ubitennis.com/feed/' }
+  ],
+  formula1: [
+    { name: 'FormulaPassion', url: 'https://formulapassion.it/feed' }
+  ],
+  mma: [
+    { name: 'MMA Mania', url: 'https://www.mmamania.com/rss/index.xml' }
+  ],
+  ciclismo: [
+    { name: 'Tuttobiciweb', url: 'https://www.tuttobiciweb.it/rss' }
+  ]
+};
 
-async function getNews() {
-  const news = [];
+async function getNews(sport = 'calcio') {
+  const sources = allSources[sport] || allSources['calcio'];
+  let news = [];
 
   for (const src of sources) {
     try {
@@ -13,27 +31,26 @@ async function getNews() {
       const xml = await res.text();
 
       const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 3);
-
       for (const item of items) {
         const titleMatch = item[1].match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item[1].match(/<title>(.*?)<\/title>/);
         const linkMatch = item[1].match(/<link>(.*?)<\/link>/);
 
         if (titleMatch && linkMatch) {
           news.push({
-            title: titleMatch[1].trim(),
-            link: linkMatch[1].trim(),
+            title: titleMatch[1],
+            link: linkMatch[1],
             source: src.name
           });
         }
       }
     } catch (e) {
-      console.error(`❌ Errore su ${src.name}:`, e.message);
+      console.error(`Errore su ${src.name}:`, e.message);
     }
   }
 
   if (!news.length) return null;
 
-  let text = `📢 *Ultime Notizie Calcio (Italia)*\n\n`;
+  let text = `📢 *Ultime Notizie ${sport.toUpperCase()}*\n\n`;
   for (const n of news.slice(0, 5)) {
     text += `📰 *${n.title}*\n📌 ${n.source}\n🔗 ${n.link}\n\n`;
   }
@@ -42,20 +59,20 @@ async function getNews() {
 }
 
 let handler = async (m, { conn }) => {
-  try {
-    const news = await getNews();
-    if (news) {
-      await conn.sendMessage(m.chat, {
-        text: news,
-        footer: '🔧 Developed by Matte',
-        headerType: 1
-      }, { quoted: m });
-    } else {
-      await m.reply('📭 Nessuna notizia trovata al momento.');
-    }
-  } catch (err) {
-    console.error('❌ Errore durante l\'invio delle notizie:', err);
-    await m.reply('⚠️ Si è verificato un errore durante il recupero delle notizie.');
+  const user = m.sender;
+  const data = global.db.data.users[user] || {};
+  const sport = data.preferredSport || 'calcio';
+
+  const news = await getNews(sport);
+
+  if (news) {
+    await conn.sendMessage(m.chat, {
+      text: news,
+      footer: `🗞️ Notizie richieste manualmente • Sport: ${sport.toUpperCase()}`,
+      headerType: 1
+    }, { quoted: m });
+  } else {
+    m.reply('📭 Nessuna notizia trovata al momento.');
   }
 };
 
