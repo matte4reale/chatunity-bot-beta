@@ -58,14 +58,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 ┃◈┃
 ┃◈┃• 💾 *RAM*: ${format(totalmem() - freemem())} / ${format(totalmem())}
 ┃◈┃• 🟢 *Free*: ${format(freemem())}
-┃◈┃
-┃◈┃• 🌐 *Network*: ${networkSpeed}
-┃◈└───────────┈⊷
-┃◈┃• *𝑽𝑬𝑹𝑺𝑰𝑶𝑵𝑬:* ${vs}
-┃◈┃•  𝐂𝐎𝐋𝐋𝐀𝐁: 𝐎𝐍𝐄 𝐏𝐈𝐄𝐂𝐄
-┃◈┃• *𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎:* (.supporto)
-╰━━━━━━━━━━━━━┈·๏
-
+┃◈╰━━━━━━━━━━━━━┈·๏
 `
 
   const profilePictureUrl = await fetchProfilePictureUrl(conn, m.sender)
