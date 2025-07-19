@@ -32,7 +32,7 @@ async function getNews() {
 
   if (!news.length) return null;
 
-  let text = '📢 *Ultime Notizie Calcio (Italia)*\n\n';
+  let text = `📢 *Ultime Notizie Calcio (Italia)*\n\n`;
   for (const n of news.slice(0, 5)) {
     text += `📰 *${n.title}*\n📌 ${n.source}\n🔗 ${n.link}\n\n`;
   }
@@ -58,3 +58,4 @@ handler.tags = ['news'];
 handler.help = ['news'];
 
 export default handler;
+Intanto questo è quello manuale
