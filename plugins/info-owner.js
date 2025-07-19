@@ -18,7 +18,7 @@ END:VCARD`.replace(/\n/g, '\r\n');
 
   await conn.sendMessage(m.chat, {
     contacts: {
-      displayName: 'Proprietari ChatUnity',
+      displayName: 'Proprietari di questo bot',
       contacts: contactsToSend
     }
   }, { quoted: m });
