@@ -27,14 +27,7 @@ Crea una scheda informativa decorata e leggibile per l'animale "*${animale}*".
 ╭─❍ 『 💫 』 *CURIOSITÀ*
 │• Inserisci 2-3 curiosità interessanti e brevi
 ╰───────────────
-
-⚠️ *Stato di conservazione:* (es. a rischio minimo / vulnerabile / in pericolo)
-
-⋆ ˚｡✦ *Fonte dati: AI Zoologica*
-⋆ ˚｡✦ *Consulta sempre fonti ufficiali per ricerche accademiche*
-
 𖦹﹒✧･ﾟﾟ･:*:･ﾟ✧﹒𖦹
-✦ 𝘊𝘳𝘦𝘥𝘪𝘵𝘪 𝘢 ᐯᗩᖇᗴ ✦
 `;
 
   try {
