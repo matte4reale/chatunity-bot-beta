@@ -128,9 +128,9 @@ ${statusList}
 ┃ 𝐅𝐮𝐧𝐳𝐢𝐨𝐧𝐞 *${featureObj.label}* ${action}
 ╰━━━━━━━━━━━━━┈·๏`.trim();
 
-    const imgUrl = isEnable
-        ? 'https://telegra.ph/file/00edd0958c94359540a8f.png'
-        : 'https://telegra.ph/file/de558c2aa7fc80d32b8c3.png';
+const imgUrl = isEnable
+  ? 'https://raw.githubusercontent.com/vasext/wa-bot-assets/main/images/enabled.png'
+  : 'https://raw.githubusercontent.com/vasext/wa-bot-assets/main/images/disabled.png';
 
     let successResponse = {
         key: {
