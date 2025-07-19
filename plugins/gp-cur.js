@@ -183,19 +183,19 @@ const handler = async (m, { conn, args, usedPrefix, text, command, groupMetadata
   if (command === 'setuser') {
     const username = text.trim()
     if (!username) {
-      await conn.sendMessage(m.chat, { text: `❌ Usa il comando così: ${usedPrefix}setuser <username>` })
+      await conn.sendMessage(m.chat, { text: `❌ Usa il comando così: ${usedPrefix}setuser <username>\n\nDeveloped by davide-turbo` })
       return
     }
 
     await setLastfmUsername(m.sender, username)
-    await conn.sendMessage(m.chat, { text: `✅ Username *${username}* salvato!` })
+    await conn.sendMessage(m.chat, { text: `✅ Username *${username}* salvato!\n\nDeveloped by davide-turbo` })
     return
   }
 
   const user = await getLastfmUsername(m.sender)
   if (!user) {
     await conn.sendMessage(m.chat, {
-      text: `🎵 *Registrazione Last.fm richiesta*\n\n@${m.sender.split('@')[0]}, per usare i comandi musicali devi registrare il tuo username Last.fm.\n\n📱 *Usa questo comando:*\n${usedPrefix}setuser <tuo_username>\n\n💡 *Non hai Last.fm?*\nRegistrati sul sito, collega Spotify e inizia a fare scrobbling della tua musica!`,
+      text: `🎵 *Registrazione Last.fm richiesta*\n\n@${m.sender.split('@')[0]}, per usare i comandi musicali devi registrare il tuo username Last.fm.\n\n📱 *Usa questo comando:*\n${usedPrefix}setuser <tuo_username>\n\n💡 *Non hai Last.fm?*\nRegistrati sul sito, collega Spotify e inizia a fare scrobbling della tua musica!\n\nDeveloped by davide-turbo`,
       mentions: [m.sender]
     })
     return
@@ -203,7 +203,7 @@ const handler = async (m, { conn, args, usedPrefix, text, command, groupMetadata
 
   if (command === 'cur') {
     const track = await getRecentTrack(user)
-    if (!track) return conn.sendMessage(m.chat, { text: '❌ Nessuna traccia trovata.' })
+    if (!track) return conn.sendMessage(m.chat, { text: '❌ Nessuna traccia trovata.\n\nDeveloped by davide-turbo' })
 
     const detailedTrack = await getTrackInfo(user, track.artist['#text'], track.name)
 
@@ -223,13 +223,13 @@ const handler = async (m, { conn, args, usedPrefix, text, command, groupMetadata
     if (image) {
       await conn.sendMessage(m.chat, {
         image: { url: image },
-        caption,
+        caption: caption + `\n\nDeveloped by davide-turbo`,
         mentions: conn.parseMention(caption)
       }, { quoted: m })
     } else {
       await conn.sendMessage(m.chat, {
-        text: caption,
-        mentions: conn.parseMention(caption)
+        text: caption + `\n\nDeveloped by davide-turbo`,
+       
       }, { quoted: m })
     }
 

@@ -129,8 +129,8 @@ ${statusList}
 ╰━━━━━━━━━━━━━┈·๏`.trim();
 
 const imgUrl = isEnable
-  ? 'https://raw.githubusercontent.com/vasext/wa-bot-assets/main/images/enabled.png'
-  : 'https://raw.githubusercontent.com/vasext/wa-bot-assets/main/images/disabled.png';
+        ? 'https://telegra.ph/file/00edd0958c94359540a8f.png'
+        : 'https://telegra.ph/file/de558c2aa7fc80d32b8c3.png';
 
     let successResponse = {
         key: {

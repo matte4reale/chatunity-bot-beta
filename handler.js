@@ -67,7 +67,7 @@ export async function handler(chatUpdate) {
                 global.db.data.chats[m.chat] = {}
             if (chat) {
                 if (!('isBanned' in chat)) chat.isBanned = false
-                if (!('welcome' in chat))chat.welcome = true
+                if (!('welcome' in chat)) chat.welcome = true
                 if (!('detect' in chat)) chat.detect = true
                 if (!('sWelcome' in chat)) chat.sWelcome = ''
                 if (!('sBye' in chat)) chat.sBye = ''
@@ -95,8 +95,6 @@ export async function handler(chatUpdate) {
                 if (!('antispamcomandi' in chat)) chat.antispamcomandi = true; // Attivo di default
                 if (!('antibestemmie' in chat)) chat.antibestemmie = false; // Attivo/disattivo anti bestemmie
                 if (!('antibot' in chat)) chat.antibot = false; // Disattivato di default
-                if (!('antimedia' in chat)) chat.antimedia = false; // <-- aggiungi questa riga
-                if (!('antipaki' in chat)) chat.antipaki = false; // <-- aggiungi questa riga
             } else
                 global.db.data.chats[m.chat] = {
                     name: this.getName(m.chat),
@@ -137,12 +135,10 @@ export async function handler(chatUpdate) {
                     money: 0, 
                     warn: 0,
                     name: m.name,
-                    antivirus: false, 
-                    antispamcomandi: true, 
-                    antibestemmie: false, 
-                    antibot: false, 
-                    antimedia: false, 
-                    antipaki: false, 
+                    antivirus: false, // Aggiunto antivirus
+                    antispamcomandi: true, // Attivo di default
+                    antibestemmie: false, // Attivo/disattivo anti bestemmie
+                    antibot: false, // Disattivato di default
                 }
             let settings = global.db.data.settings[this.user.jid]
             if (typeof settings !== 'object') global.db.data.settings[this.user.jid] = {}
@@ -435,7 +431,8 @@ export async function handler(chatUpdate) {
             if (quequeIndex !== -1)
                 this.msgqueque.splice(quequeIndex, 1)
         }
-
+        // conn.sendPresenceUpdate('composing', m.chat) 
+        //console.log(global.db.data.users[m.sender])
 let chat, user, stats = global.db.data.stats
 if (m) { let utente = global.db.data.users[m.sender];
 if (utente.muto == true) {
@@ -495,6 +492,32 @@ remoteJid: m.chat, fromMe: false, id: bang, participant: cancellazzione
 }
 
 /**
+ * Handle groups participants update
+ * @param {import('@whiskeysockets/baileys').BaileysEventMap<unknown>['group-participants.update']} groupsUpdate 
+ */
+export async function participantsUpdate({ id, participants, action }) {
+    if (opts['self'])
+        return
+    // if (id in conn.chats) return // First login will spam
+    if (this.isInit) 
+        return
+    if (global.db.data == null)
+        await loadDatabase()
+    let chat = global.db.data.chats[id] || {}
+    let text = ''
+    switch (action) {
+        case 'add':
+        case 'remove':
+            // Funzione benvenuto/addio rimossa
+            break;
+        case 'promote':
+        case 'demote':
+            // Disabilita i messaggi automatici per promozioni/demozioni
+            return; // Aggiunto return per evitare l'invio di messaggi
+    }
+}
+
+/**
  * Handle groups update
  * @param {import('@whiskeysockets/baileys').BaileysEventMap<unknown>['groups.update']} groupsUpdate 
  */
@@ -549,7 +572,7 @@ global.dfail = (type, m, conn) => {
         mods: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐥𝐨 𝐩𝐨𝐬𝐬𝐨𝐧𝐨 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐞 𝐬𝐨𝐥𝐨 𝐚𝐝𝐦𝐢𝐧 𝐞 𝐨𝐰𝐧𝐞𝐫 ⚙️',
         premium: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐞̀ 𝐩𝐞𝐫 𝐦𝐞𝐦𝐛𝐫𝐢 𝐩𝐫𝐞𝐦𝐢𝐮𝐦 ✅',
         group: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐥𝐨 𝐢𝐧 𝐮𝐧 𝐠𝐫𝐮𝐩𝐩𝐨 👥',
-        private: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐥𝐨 𝐢𝐧 𝐜𝐡𝐚𝐭 𝐩𝐫𝐢𝐯𝐚𝐭𝐚 👤',
+        private: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐧𝐢𝐳𝐚𝐫𝐥𝐨 𝐢𝐧 𝐜𝐡𝐚𝐭 𝐩𝐫𝐢𝐯𝐚𝐭𝐚 👤',
         admin: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐞̀ 𝐩𝐞𝐫 𝐬𝐨𝐥𝐢 𝐚𝐝𝐦𝐢𝐧 👑',
         botAdmin: '𝐃𝐞𝐯𝐢 𝐝𝐚𝐫𝐞 𝐚𝐝𝐦𝐢𝐧 𝐚𝐥 𝐛𝐨𝐭 👑',
         restrict: '🔐 𝐑𝐞𝐬𝐭𝐫𝐢𝐜𝐭 𝐞 𝐝𝐢𝐬𝐚𝐭𝐭𝐢𝐯𝐚𝐭𝐨 🔐'}[type]

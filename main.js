@@ -147,12 +147,12 @@ console.log(chalk.bold.redBright('Opzione non valida. Inserisci solo 1 o 2.'));
 }
 
 console.info = () => {}
-//console.warn = () => {}
+//console.warn = () =>{}
 const connectionOptions = {
 logger: pino({ level: 'silent' }),
 printQRInTerminal: opcion == '1' ? true : methodCodeQR ? true : false,
 mobile: MethodMobile, 
-browser: opcion == '1' ? ['𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭 5.3', 'Safari', '5.1.0'] : methodCodeQR ? ['𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭', 'Safari', '5.1.0'] : ['Ubuntu', 'Chrome', '110.0.5585.95'],
+browser: opcion == '1' ? ['𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭 6.0', 'Safari', '5.1.0'] : methodCodeQR ? ['𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭', 'Safari', '5.1.0'] : ['Ubuntu', 'Chrome', '110.0.5585.95'],
 auth: {
 creds: state.creds,
 keys: makeCacheableSignalKeyStore(state.keys, Pino({ level: "fatal" }).child({ level: "fatal" })),
@@ -360,9 +360,16 @@ let handler = await import('./handler.js');
 global.reloadHandler = async function(restatConn) {
   try {
     const Handler = await import(`./handler.js?update=${Date.now()}`).catch(console.error);
-    if (Object.keys(Handler || {}).length) handler = Handler;
+    // Ensure Handler is valid and has required properties
+    if (Handler && Handler.handler && Handler.participantsUpdate && Handler.groupsUpdate && Handler.deleteUpdate && Handler.callUpdate) {
+      handler = Handler;
+    } else {
+      console.error('Handler module is missing required exports. Skipping reloadHandler binding.');
+      return false;
+    }
   } catch (e) {
     console.error(e);
+    return false;
   }
   if (restatConn) {
     const oldChats = global.conn.chats;
