@@ -1,26 +1,39 @@
-let handler = async (m, { conn, args }) => {
-    let group = m.chat
-    let link = 'https://chat.whatsapp.com/' + await conn.groupInviteCode(group)
-    
-    // Get bot name from database or use default
-    let nomeDelBot = global.db.data.nomedelbot || `𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲`
-  
-    await conn.sendMessage(m.chat, { 
-      text: link,
-      contextInfo: {
-        forwardingScore: 99,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363259442839354@newsletter',
-          serverMessageId: '',
-          newsletterName: `${nomeDelBot}`
+const handler = async (m, { conn, args }) => {
+    const metadata = await conn.groupMetadata(m.chat);
+    const groupName = metadata.subject;
+
+    const interactiveButtons = [
+        {
+            name: "cta_copy",
+            buttonParamsJson: JSON.stringify({
+                display_text: "Copia",
+                id: 'https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat),
+                copy_code: 'https://chat.whatsapp.com/' + await conn.groupInviteCode(m.chat)
+            })
+        },
+        {
+            name: "quick_reply",
+            buttonParamsJson: JSON.stringify({
+                display_text: "Reimposta",
+                id: `/reimpostagruppo ${m.chat}`,
+            })
         }
-      }
-    }, { quoted: m, detectLink: true })
-  }
-  
-  handler.command = /^link(gro?up)?$/i
-  handler.admin = true
-  handler.group = true
-  handler.botAdmin = true
-  export default handler
+    ];
+
+    const interactiveMessage = {
+        text: `*${groupName}*`,
+        title: "Eccoti il link del gruppo:",
+        footer: "Scegli una delle seguenti opzioni:",
+        interactiveButtons
+    };
+
+    await conn.sendMessage(m.chat, interactiveMessage, { quoted: m });
+};
+
+handler.help = ['linkgroup'];
+handler.tags = ['group'];
+handler.command = /^link(gro?up)?$/i;
+handler.group = true;
+handler.botAdmin = true;
+
+export default handler;
