@@ -1,25 +1,30 @@
-let handler = async (m, { conn }) => {
-    const createVCard = (name, number, role) => {
-        return `BEGIN:VCARD
+import fs from 'fs';
+
+let handler = async function (m, { conn }) {
+  const data = global.owner.filter(([id, isCreator]) => id && isCreator);
+
+  const contactsToSend = data.map(([id, name]) => {
+    const vcard = `BEGIN:VCARD
 VERSION:3.0
 FN:${name}
-ORG:ChatUnity;
-TEL;type=CELL;type=VOICE;waid=${number}:+${number}
-X-ABLabel:${role}
+TEL;type=CELL;type=VOICE;waid=${id.replace('@s.whatsapp.net','')}:${id.replace('@s.whatsapp.net','')}
 END:VCARD`.replace(/\n/g, '\r\n');
-    };
 
-    await conn.sendMessage(m.chat, { 
-        contacts: { 
-            displayName: 'Creatore', 
-            contacts: [
-                { vcard: createVCard('Creatore', '393515533859', 'Founder') }
-            ]
-        }
-    }, { quoted: m });
+    return {
+      displayName: name,
+      vcard
+    };
+  });
+
+  await conn.sendMessage(m.chat, {
+    contacts: {
+      displayName: 'Proprietari ChatUnity',
+      contacts: contactsToSend
+    }
+  }, { quoted: m });
 };
 
-handler.help = ['creatore'];
-handler.tags = ['info'];
-handler.command = ['creatore', 'proprietario', 'owner']; // ✅ Qui la correzione
+handler.help = ['owner'];
+handler.tags = ['main'];
+handler.command = ['padroni','owner'];
 export default handler;
