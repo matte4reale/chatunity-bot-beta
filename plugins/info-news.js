@@ -47,7 +47,7 @@ let handler = async (m, { conn }) => {
     if (news) {
       await conn.sendMessage(m.chat, {
         text: news,
-        footer: '🗞️ Notizie richieste manualmente',
+        footer: '🔧 Developed by Matte',
         headerType: 1
       }, { quoted: m });
     } else {
