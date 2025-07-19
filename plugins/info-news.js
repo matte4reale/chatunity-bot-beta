@@ -58,7 +58,7 @@ let commandHandler = async (m, { conn }) => {
 };
 
 // 🔁 Invio automatico ogni 10 minuti
-let autoHandler = async (m, { conn }) => {
+let autoHandler = async (m, conn) => {
   const id = m.chat;
   const now = Date.now();
 
