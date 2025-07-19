@@ -49,7 +49,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
   let networkSpeed = 'N/A'
 
   let caption = `╭━〔🚀𝑺𝑻𝑨𝑻𝐎 𝑺𝑰𝑺𝑻𝑬𝑴𝑨🚀〕━┈⊷
-┃◈╭─────────────·๏
+┃◈╭───────────·๏
 ┃◈┃• ⌛ *Uptime*: ${clockString(uptime)}
 ┃◈┃• ⚡ *Ping*: ${speed} ms
 ┃◈┃
@@ -58,7 +58,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 ┃◈┃
 ┃◈┃• 💾 *RAM*: ${format(totalmem() - freemem())} / ${format(totalmem())}
 ┃◈┃• 🟢 *Free*: ${format(freemem())}
-┃◈╰━━━━━━━━━━━━━┈·๏
+┃◈╰━━━━━━━━━━━┈·๏
 `
 
   const profilePictureUrl = await fetchProfilePictureUrl(conn, m.sender)
