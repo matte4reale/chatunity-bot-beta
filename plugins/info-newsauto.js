@@ -8,7 +8,7 @@ const sources = [
 ];
 
 async function getNews() {
-  let news = [];
+  const news = [];
 
   for (const src of sources) {
     try {
@@ -16,20 +16,21 @@ async function getNews() {
       const xml = await res.text();
 
       const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 3);
+
       for (const item of items) {
         const titleMatch = item[1].match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item[1].match(/<title>(.*?)<\/title>/);
         const linkMatch = item[1].match(/<link>(.*?)<\/link>/);
 
         if (titleMatch && linkMatch) {
           news.push({
-            title: titleMatch[1],
-            link: linkMatch[1],
+            title: titleMatch[1].trim(),
+            link: linkMatch[1].trim(),
             source: src.name
           });
         }
       }
     } catch (e) {
-      console.error(`Errore su ${src.name}:`, e.message);
+      console.error(`❌ Errore su ${src.name}:`, e.message);
     }
   }
 
@@ -43,7 +44,8 @@ async function getNews() {
   return text.trim();
 }
 
-let handler = async (m, { conn }) => {
+// Funzione per l’invio automatico (eseguita ogni messaggio da handler.js)
+let autoHandler = async (m, conn) => {
   const chat = m.chat;
   const now = Date.now();
 
@@ -60,6 +62,6 @@ let handler = async (m, { conn }) => {
   }
 };
 
-handler.all = handler;
-
-export default handler;
+export default {
+  all: autoHandler
+};
