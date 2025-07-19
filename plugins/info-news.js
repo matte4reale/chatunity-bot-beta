@@ -1,11 +1,11 @@
-const allSources = {
+const sourcesBySport = {
   calcio: [
     { name: 'Gazzetta', url: 'https://www.gazzetta.it/rss/Calcio.xml' },
     { name: 'Tuttosport', url: 'https://www.tuttosport.com/rss/calcio.xml' },
     { name: 'Corriere dello Sport', url: 'https://www.corrieredellosport.it/rss/calcio' }
   ],
   basket: [
-    { name: 'Sky Sport - Basket', url: 'https://sport.sky.it/rss/basket.xml' }
+    { name: 'Sky Basket', url: 'https://www.sportando.basketball/feed/' }
   ],
   tennis: [
     { name: 'Ubitennis', url: 'https://www.ubitennis.com/feed/' }
@@ -14,23 +14,23 @@ const allSources = {
     { name: 'FormulaPassion', url: 'https://formulapassion.it/feed' }
   ],
   mma: [
-    { name: 'MMA Mania', url: 'https://www.mmamania.com/rss/index.xml' }
+    { name: 'MMA Mania', url: 'https://www.mmamania.com/rss/current.xml' }
   ],
   ciclismo: [
-    { name: 'Tuttobiciweb', url: 'https://www.tuttobiciweb.it/rss' }
+    { name: 'CyclingNews', url: 'https://www.cyclingnews.com/rss/news/' }
   ]
 };
 
 async function getNews(sport = 'calcio') {
-  const sources = allSources[sport] || allSources['calcio'];
   let news = [];
+  const sources = sourcesBySport[sport] || [];
 
   for (const src of sources) {
     try {
       const res = await fetch(src.url);
       const xml = await res.text();
-
       const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 3);
+
       for (const item of items) {
         const titleMatch = item[1].match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item[1].match(/<title>(.*?)<\/title>/);
         const linkMatch = item[1].match(/<link>(.*?)<\/link>/);
@@ -50,7 +50,7 @@ async function getNews(sport = 'calcio') {
 
   if (!news.length) return null;
 
-  let text = `📢 *Ultime Notizie ${sport.toUpperCase()}*\n\n`;
+  let text = `📢 *Ultime notizie - ${sport.toUpperCase()}*\n\n`;
   for (const n of news.slice(0, 5)) {
     text += `📰 *${n.title}*\n📌 ${n.source}\n🔗 ${n.link}\n\n`;
   }
@@ -68,16 +68,15 @@ let handler = async (m, { conn }) => {
   if (news) {
     await conn.sendMessage(m.chat, {
       text: news,
-      footer: `🗞️ Notizie richieste manualmente • Sport: ${sport.toUpperCase()}`,
+      footer: '🗞️ Notizie aggiornate',
       headerType: 1
     }, { quoted: m });
   } else {
-    m.reply('📭 Nessuna notizia trovata al momento.');
+    m.reply('📭 Nessuna notizia trovata.');
   }
 };
 
 handler.command = /^news$/i;
 handler.tags = ['news'];
 handler.help = ['news'];
-
 export default handler;
