@@ -1,6 +1,3 @@
-const INTERVAL = 10 * 60 * 1000;
-const cache = {};
-
 const sources = [
   { name: 'Gazzetta', url: 'https://www.gazzetta.it/rss/Calcio.xml' },
   { name: 'Tuttosport', url: 'https://www.tuttosport.com/rss/calcio.xml' },
@@ -29,7 +26,7 @@ async function getNews() {
         }
       }
     } catch (e) {
-      console.error(`❌ Errore su ${src.name}:`, e.message);
+      console.error(`Errore su ${src.name}:`, e.message);
     }
   }
 
@@ -43,8 +40,7 @@ async function getNews() {
   return text.trim();
 }
 
-// 💬 Comando: .news
-let commandHandler = async (m, { conn }) => {
+let handler = async (m, { conn }) => {
   const news = await getNews();
   if (news) {
     await conn.sendMessage(m.chat, {
@@ -57,27 +53,9 @@ let commandHandler = async (m, { conn }) => {
   }
 };
 
-// 🔁 Invio automatico ogni 10 minuti
-let autoHandler = async (m, conn) => {
-  const id = m.chat;
-  const now = Date.now();
+handler.command = /^news$/i;
+handler.tags = ['news'];
+handler.help = ['news'];
 
-  if (!cache[id] || now - cache[id] > INTERVAL) {
-    const news = await getNews();
-    if (news) {
-      cache[id] = now;
-      await conn.sendMessage(id, {
-        text: news,
-        footer: '🗞️ Notizie automatiche (Gazzetta, Tuttosport, CDS)',
-        headerType: 1
-      }, { quoted: m });
-    }
-  }
-};
-
-commandHandler.command = /^news$/i;
-commandHandler.tags = ['news'];
-commandHandler.help = ['news'];
-commandHandler.all = autoHandler;
-
-export default commandHandler;
+export default handler;
+Intanto questo è quello manuale
