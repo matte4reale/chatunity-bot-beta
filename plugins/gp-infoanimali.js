@@ -1,29 +1,44 @@
 import axios from 'axios';
 
-const riassuntoPlugin = async (m, { conn, text, usedPrefix, command, quoted }) => {
-  // Prendo testo dal comando o da messaggio a cui si risponde
-  const input = text || (quoted && (quoted.text || quoted.body)) || '';
-
-  if (!input || input.length < 20) {
-    return conn.reply(m.chat, `❗ Usa il comando così:\n\n${usedPrefix + command} <testo lungo>\n\nOppure rispondi a un messaggio lungo con il comando ${usedPrefix + command}`, m);
+const infoAnimalePlugin = async (m, { conn, text, usedPrefix, command }) => {
+  if (!text) {
+    return conn.reply(m.chat, `﹒⋆❛ ${usedPrefix + command} <nome animale>\n❥ Per favore indica un animale di cui vuoi informazioni!\nEsempio: *${usedPrefix + command} fennec*`, m);
   }
 
-  if (input.length > 2500) {
-    return conn.reply(m.chat, '❌ Il testo è troppo lungo. Limite massimo: 2500 caratteri.', m);
-  }
+  const animale = text.trim();
 
   const prompt = `
-Riassumi sinteticamente e chiaramente questo testo:
+Crea una scheda informativa decorata e leggibile per l'animale "*${animale}*".
 
-${input}
+❥ Il tono deve essere divulgativo ma leggero. Usa simboli estetici ma non esagerati.
+❥ Rispondi sempre in italiano.
+❥ Il formato deve essere **esattamente** questo (modifica solo i dati reali, non lo stile):
 
-Rispondi in italiano, in modo semplice e comprensibile. Usa un formato chiaro e pulito.
+★·.·´¯\`·.·★ ⟡ ˚｡⋆『 ˗ˏˋ  ${animale.toUpperCase()}  ˎˊ˗ 』⋆｡˚⟡ ★·.·´¯\`·.·★
+
+🦊 *Nome comune:* ${animale}
+📚 *Nome scientifico:* (es. Vulpes vulpes)
+🌍 *Habitat:* (es. Foreste temperate, deserti, savane...)
+🍽️ *Dieta:* (erbivoro, onnivoro, carnivoro – dettaglia con esempi)
+📏 *Dimensioni:* (lunghezza/peso medio)
+🧠 *Comportamento:* (solitario, sociale, notturno, ecc.)
+🎨 *Caratteristiche:* (es. pelo, becco, artigli, dentatura...)
+
+╭─❍ 『 💫 』 *CURIOSITÀ*
+│• Inserisci 2-3 curiosità interessanti e brevi
+╰───────────────
+
+⚠️ *Stato di conservazione:* (es. a rischio minimo / vulnerabile / in pericolo)
+
+⋆ ˚｡✦ *Fonte dati: AI Zoologica*
+⋆ ˚｡✦ *Consulta sempre fonti ufficiali per ricerche accademiche*
+
+𖦹﹒✧･ﾟﾟ･:*:･ﾟ✧﹒𖦹
+✦ 𝘊𝘳𝘦𝘥𝘪𝘵𝘪 𝘢 ᐯᗩᖇᗴ ✦
 `;
 
   try {
     await conn.sendPresenceUpdate('composing', m.chat);
-
-    // Esempio chiamata a API custom come luminai o GPT-like
     const res = await axios.post("https://luminai.my.id", {
       content: prompt,
       user: m.pushName || "utente",
@@ -34,16 +49,16 @@ Rispondi in italiano, in modo semplice e comprensibile. Usa un formato chiaro e 
     const risposta = res.data.result;
     if (!risposta) throw new Error("Risposta vuota dall'API.");
 
-    return conn.reply(m.chat, `📚 *Riassunto:*\n\n${risposta}`, m);
+    return await conn.reply(m.chat, risposta, m);
 
   } catch (err) {
-    console.error('[❌ riassunto plugin errore]', err);
-    return conn.reply(m.chat, '⚠️ Errore durante la generazione del riassunto. Riprova più tardi.', m);
+    console.error('[❌ infoanimale plugin errore]', err);
+    return await conn.reply(m.chat, '⚠️ Errore durante l’elaborazione della scheda animale. Riprova più tardi.', m);
   }
 };
 
-riassuntoPlugin.help = ['riassunto <testo o risposta a messaggio>'];
-riassuntoPlugin.tags = ['ai', 'utilità'];
-riassuntoPlugin.command = /^riassunto$/i;
+infoAnimalePlugin.help = ['infoanimale <animale>'];
+infoAnimalePlugin.tags = ['animali', 'ai', 'divulgazione'];
+infoAnimalePlugin.command = /^infoanimale$/i;
 
-export default riassuntoPlugin;
+export default infoAnimalePlugin;
