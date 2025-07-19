@@ -1,32 +1,83 @@
-import fetch from 'node-fetch';
+const INTERVAL = 10 * 60 * 1000;
+const cache = {};
 
-const GNEWS_API_KEY = '4062dec5ad3c4197e17922fe1806cf11';
+const sources = [
+  { name: 'Gazzetta', url: 'https://www.gazzetta.it/rss/Calcio.xml' },
+  { name: 'Tuttosport', url: 'https://www.tuttosport.com/rss/calcio.xml' },
+  { name: 'Corriere dello Sport', url: 'https://www.corrieredellosport.it/rss/calcio' }
+];
 
 async function getNews() {
-  try {
-    const res = await fetch(`https://gnews.io/api/v4/search?q=calcio&lang=it&max=5&apikey=${GNEWS_API_KEY}`);
-    const json = await res.json();
-    if (!json.articles || json.articles.length === 0) return null;
+  let news = [];
 
-    let text = `📢 *Ultime Notizie Calcio*\n\n`;
-    for (const a of json.articles) {
-      text += `📰 *${a.title}*\n📌 ${a.source.name}\n🔗 ${a.url}\n\n`;
+  for (const src of sources) {
+    try {
+      const res = await fetch(src.url);
+      const xml = await res.text();
+
+      const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 3);
+      for (const item of items) {
+        const titleMatch = item[1].match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item[1].match(/<title>(.*?)<\/title>/);
+        const linkMatch = item[1].match(/<link>(.*?)<\/link>/);
+
+        if (titleMatch && linkMatch) {
+          news.push({
+            title: titleMatch[1],
+            link: linkMatch[1],
+            source: src.name
+          });
+        }
+      }
+    } catch (e) {
+      console.error(`❌ Errore su ${src.name}:`, e.message);
     }
-
-    return text;
-  } catch (e) {
-    console.error('Errore fetch news:', e);
-    return null;
   }
+
+  if (!news.length) return null;
+
+  let text = `📢 *Ultime Notizie Calcio (Italia)*\n\n`;
+  for (const n of news.slice(0, 5)) {
+    text += `📰 *${n.title}*\n📌 ${n.source}\n🔗 ${n.link}\n\n`;
+  }
+
+  return text.trim();
 }
 
-let handler = async (m, { conn }) => {
+// 💬 Comando: .news
+let commandHandler = async (m, { conn }) => {
   const news = await getNews();
-  if (!news) return m.reply('❌ Nessuna news trovata.');
-  return conn.sendMessage(m.chat, { text: news }, { quoted: m });
+  if (news) {
+    await conn.sendMessage(m.chat, {
+      text: news,
+      footer: '🗞️ Notizie richieste manualmente',
+      headerType: 1
+    }, { quoted: m });
+  } else {
+    m.reply('📭 Nessuna notizia trovata al momento.');
+  }
 };
 
-handler.command = /^news$/i;
-handler.help = ['news'];
-handler.tags = ['news'];
-export default handler;
+// 🔁 Invio automatico ogni 10 minuti
+let autoHandler = async (m, { conn }) => {
+  const id = m.chat;
+  const now = Date.now();
+
+  if (!cache[id] || now - cache[id] > INTERVAL) {
+    const news = await getNews();
+    if (news) {
+      cache[id] = now;
+      await conn.sendMessage(id, {
+        text: news,
+        footer: '🗞️ Notizie automatiche (Gazzetta, Tuttosport, CDS)',
+        headerType: 1
+      }, { quoted: m });
+    }
+  }
+};
+
+commandHandler.command = /^news$/i;
+commandHandler.tags = ['news'];
+commandHandler.help = ['news'];
+commandHandler.all = autoHandler;
+
+export default commandHandler;
