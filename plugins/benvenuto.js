@@ -1,4 +1,4 @@
-import { generateWelcomeImage } from './welcomeImage.js';
+import { generateWelcomeImage } from '../welcomeImage.js';
 import { writeFileSync } from 'fs';
 
 conn.on('group-participants-update', async (update) => {
