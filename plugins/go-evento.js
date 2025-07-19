@@ -25,5 +25,5 @@ let handler = async (m, { conn, text, args, command }) => {
   );
 };
 
-handler.command = ['creaevento, evento'];
+handler.command = ['creaevento'];
 export default handler;
