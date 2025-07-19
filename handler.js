@@ -435,8 +435,7 @@ export async function handler(chatUpdate) {
             if (quequeIndex !== -1)
                 this.msgqueque.splice(quequeIndex, 1)
         }
-        // conn.sendPresenceUpdate('composing', m.chat) 
-        //console.log(global.db.data.users[m.sender])
+
 let chat, user, stats = global.db.data.stats
 if (m) { let utente = global.db.data.users[m.sender];
 if (utente.muto == true) {
