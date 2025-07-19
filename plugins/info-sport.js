@@ -12,7 +12,7 @@ let handler = async (m, { conn }) => {
   ];
 
   const buttons = sports.map(s => ({
-    buttonId: `.sport ${s.value}`,
+    buttonId: `.chooseSport ${s.value}`,
     buttonText: { displayText: s.name },
     type: 1
   }));
