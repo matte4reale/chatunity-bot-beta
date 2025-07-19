@@ -5,7 +5,7 @@ const sources = [
 ];
 
 async function getNews() {
-  let news = [];
+  const news = [];
 
   for (const src of sources) {
     try {
@@ -13,20 +13,21 @@ async function getNews() {
       const xml = await res.text();
 
       const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 3);
+
       for (const item of items) {
         const titleMatch = item[1].match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item[1].match(/<title>(.*?)<\/title>/);
         const linkMatch = item[1].match(/<link>(.*?)<\/link>/);
 
         if (titleMatch && linkMatch) {
           news.push({
-            title: titleMatch[1],
-            link: linkMatch[1],
+            title: titleMatch[1].trim(),
+            link: linkMatch[1].trim(),
             source: src.name
           });
         }
       }
     } catch (e) {
-      console.error(`Errore su ${src.name}:`, e.message);
+      console.error(`❌ Errore su ${src.name}:`, e.message);
     }
   }
 
@@ -41,15 +42,20 @@ async function getNews() {
 }
 
 let handler = async (m, { conn }) => {
-  const news = await getNews();
-  if (news) {
-    await conn.sendMessage(m.chat, {
-      text: news,
-      footer: '🗞️ Notizie richieste manualmente',
-      headerType: 1
-    }, { quoted: m });
-  } else {
-    m.reply('📭 Nessuna notizia trovata al momento.');
+  try {
+    const news = await getNews();
+    if (news) {
+      await conn.sendMessage(m.chat, {
+        text: news,
+        footer: '🗞️ Notizie richieste manualmente',
+        headerType: 1
+      }, { quoted: m });
+    } else {
+      await m.reply('📭 Nessuna notizia trovata al momento.');
+    }
+  } catch (err) {
+    console.error('❌ Errore durante l\'invio delle notizie:', err);
+    await m.reply('⚠️ Si è verificato un errore durante il recupero delle notizie.');
   }
 };
 
@@ -58,4 +64,3 @@ handler.tags = ['news'];
 handler.help = ['news'];
 
 export default handler;
-Intanto questo è quello manuale
