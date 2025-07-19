@@ -1,28 +1,53 @@
-import { chatgpt } from '../lib/openai.js';
+import axios from 'axios';
 
-let handler = async (m, { text, quoted }) => {
-  let input = text || (quoted?.text || quoted?.body || '');
+const riassuntoPlugin = async (m, { conn, text, usedPrefix, command }) => {
+  let input = text;
+  if (!input && m.quoted) {
+    input = m.quoted.text || m.quoted.body || '';
+  }
 
   if (!input || input.length < 20) {
-    return m.reply('📌 *Usa il comando così:*\n\n• `.riassunto Questo è il testo da riassumere`\n• Oppure rispondi a un messaggio lungo con `.riassunto`');
+    return conn.reply(m.chat,
+      `❗ Usa il comando così:\n` +
+      `${usedPrefix + command} <testo lungo>\n` +
+      `Oppure rispondi a un messaggio lungo con il comando ${usedPrefix + command}`, m);
   }
 
   if (input.length > 2500) {
-    return m.reply('❌ Il messaggio è troppo lungo (max 2500 caratteri).');
+    return conn.reply(m.chat, '❌ Il testo è troppo lungo. Limite massimo: 2500 caratteri.', m);
   }
 
-  let prompt = `Fai un riassunto chiaro, semplice e sintetico di questo testo:\n\n${input}`;
+  const prompt = `
+Riassumi sinteticamente e chiaramente questo testo:
+
+${input}
+
+Rispondi in italiano, in modo semplice e comprensibile. Usa un formato chiaro e pulito.
+`;
+
   try {
-    let res = await chatgpt(prompt);
-    return m.reply('📚 *Riassunto GPT:*\n\n' + res.trim());
+    await conn.sendPresenceUpdate('composing', m.chat);
+
+    const res = await axios.post("https://luminai.my.id", {
+      content: prompt,
+      user: m.pushName || "utente",
+      prompt: `Rispondi sempre in italiano.`,
+      webSearchMode: false
+    });
+
+    const risposta = res.data.result;
+    if (!risposta) throw new Error("Risposta vuota dall'API.");
+
+    return conn.reply(m.chat, `📚 *Riassunto:*\n\n${risposta}`, m);
+
   } catch (err) {
-    console.error(err);
-    return m.reply('❌ Errore nel generare il riassunto.');
+    console.error('[❌ riassunto plugin errore]', err);
+    return conn.reply(m.chat, '⚠️ Errore durante la generazione del riassunto. Riprova più tardi.', m);
   }
 };
 
-handler.help = ['riassunto <testo>'];
-handler.tags = ['ai', 'tools'];
-handler.command = /^riassunto$/i;
+riassuntoPlugin.help = ['riassunto <testo o risposta a messaggio>'];
+riassuntoPlugin.tags = ['ai', 'utilità'];
+riassuntoPlugin.command = /^riassunto$/i;
 
-export default handler;
+export default riassuntoPlugin;
